@@ -1,6 +1,6 @@
 main:
-  components_repository: "src"
-  #components_repository: "components"
+  #components_repository: "src"
+  components_repository: "components"
   # All the intermediate files will be copied to this directory at the end of the run.
   # Set this to null if you are running in prod
   project_name: nyc_airbnb
