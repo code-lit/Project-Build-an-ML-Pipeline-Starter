@@ -13,12 +13,16 @@ logger = logging.getLogger()
 
 # DO NOT MODIFY
 def go(args):
-
-    run = wandb.init(job_type="basic_cleaning")
+    run = wandb.init(
+        project="nyc_airbnb",  # ← forces artifacts into this project
+        entity="yeabzed19-yab",  # ←  W&B username/team (important)
+        job_type="basic_cleaning",
+        group="cleaning",
+        save_code=True
+    )
     run.config.update(args)
-
     # Download input artifact. This will also log that this script is using this
-    
+
     run = wandb.init(project="nyc_airbnb", group="cleaning", save_code=True)
     artifact_local_path = run.use_artifact(args.input_artifact).file()
     df = pd.read_csv(artifact_local_path)
@@ -54,49 +58,48 @@ def go(args):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="A very basic data cleaning")
-  
+
     parser.add_argument(
-        "--input_artifact", 
-        type = ## INSERT TYPE HERE: str, float or int,
-        help = ## INSERT DESCRIPTION HERE,
-        required = True
+        "--input_artifact",
+        type=str,
+        help="The fully qualified name of the input artifact to download from W&B (e.g. 'user/project/artifact:version')",
+        required=True
     )
 
     parser.add_argument(
-        "--output_artifact", 
-        type = ## INSERT TYPE HERE: str, float or int,
-        help = ## INSERT DESCRIPTION HERE,
-        required = True
+        "--output_artifact",
+        type=str,
+        help="Name for the output artifact to log to W&B (e.g. 'clean_sample')",
+        required=True
     )
 
     parser.add_argument(
-        "--output_type", 
-        type = ## INSERT TYPE HERE: str, float or int,
-        help = ## INSERT DESCRIPTION HERE,
-        required = True
+        "--output_type",
+        type=str,
+        help="Type of the output artifact to log to W&B (e.g. 'clean_sample')",
+        required=True
     )
 
     parser.add_argument(
-        "--output_description", 
-        type = ## INSERT TYPE HERE: str, float or int,
-        help = ## INSERT DESCRIPTION HERE,
-        required = True
+        "--output_description",
+        type=str,
+        help="A human-readable description of the output artifact",
+        required=True
     )
 
     parser.add_argument(
-        "--min_price", 
-        type = ## INSERT TYPE HERE: str, float or int,
-        help = ## INSERT DESCRIPTION HERE,
-        required = True
+        "--min_price",
+        type=float,
+        help="Minimum price threshold to keep rows (drop listings with price below this value)",
+        required=True
     )
 
     parser.add_argument(
         "--max_price",
-        type = ## INSERT TYPE HERE: str, float or int,
-        help = ## INSERT DESCRIPTION HERE,
-        required = True
+        type=float,
+        help="Maximum price threshold to keep rows (drop listings with price above this value)",
+        required=True
     )
-
 
     args = parser.parse_args()
 
