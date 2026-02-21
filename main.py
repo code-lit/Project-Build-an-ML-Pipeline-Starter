@@ -38,7 +38,7 @@ def go(config: DictConfig):
         if "download" in active_steps:
             # Download file and load in W&B
             _ = mlflow.run(
-                f"{config['main']['components_repository']}/get_data",
+                "components/get_data",
                 "main",
                 env_manager="conda",
                 parameters={
@@ -48,17 +48,19 @@ def go(config: DictConfig):
                     "artifact_description": "Raw file as downloaded"
                 },
             )
-
+        pass
         if "basic_cleaning" in active_steps:
             _ = mlflow.run(
-                f"{config['main']['components_repository']}/basic_cleaning",
+                "src/basic_cleaning",
                 "main",
                 env_manager="conda",
                 parameters={
                     "input_artifact": config["data"]["raw_artifact"],
-                    "output_artifact": "clean_data.csv",
-                    "output_type": "clean_data",
-                    "output_description": "Cleaned dataset after basic preprocessing"
+                    "output_artifact": "clean_sample.csv",
+                    "output_type": "cleaned_data",
+                    "output_description": "Cleaned dataset with price + boundary filtering",
+                    "min_price": float(config["etl"]["min_price"]),
+                    "max_price": float(config["etl"]["max_price"]),
                 },
             )
 
@@ -66,16 +68,15 @@ def go(config: DictConfig):
 
         if "data_check" in active_steps:
             _ = mlflow.run(
-                f"{config['main']['components_repository']}/data_check",
+                "src/data_check",
                 "main",
                 env_manager="conda",
                 parameters={
-                    # These must match src/data_check/MLproject parameter names:
                     "csv": "clean_sample.csv:latest",
                     "ref": "clean_sample.csv:reference",
-                    "kl_threshold": config["data_check"]["kl_threshold"],
-                    "min_price": config["etl"]["min_price"],
-                    "max_price": config["etl"]["max_price"],
+                    "kl_threshold": float(config["data_check"]["kl_threshold"]),
+                    "min_price": float(config["etl"]["min_price"]),
+                    "max_price": float(config["etl"]["max_price"]),
                 },
             )
 
@@ -83,7 +84,7 @@ def go(config: DictConfig):
 
         if "train_val_test_split" in active_steps:
             _ = mlflow.run(
-                f"{config['main']['components_repository']}/train_val_test_split",
+                "components/train_val_test_split",
                 "main",
                 env_manager="conda",
                 parameters={
